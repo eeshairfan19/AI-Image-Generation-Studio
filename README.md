@@ -1,1 +1,1 @@
-# AI-Image-Generation-Studio
+A Streamlit-based AI Image Generation Studio that transforms natural language prompts into AI-generated images using the DeepAI Text-to-Image API. Features configurable art styles, image generation settings, and a clean, interactive interface with secure API key management.
