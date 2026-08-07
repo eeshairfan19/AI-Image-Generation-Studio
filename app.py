@@ -1,9 +1,14 @@
 import streamlit as st
+import requests
+from PIL import Image
+from io import BytesIO
 
 st.set_page_config(
     page_title="AI Image Generation Studio",
     layout="wide",
 )
+
+DEEPAI_API_KEY = st.secrets["DEEPAI_API_KEY"]
 
 st.title("AI Image Generation Studio")
 
@@ -80,6 +85,48 @@ with right_col:
 
     st.header("Generated Images")
 
-    st.info(
-        "Your generated image(s) will appear here after clicking **Generate Images**."
-    )
+    if generate:
+        if prompt.strip():
+        
+                with st.spinner("Generating image..."):
+        
+                    try:
+        
+                        full_prompt = f"{style} style: {prompt}"
+        
+                        response = requests.post(
+                            "https://api.deepai.org/api/text2img",
+                            data={
+                                "text": full_prompt,
+                            },
+                            headers={
+                                "api-key": DEEPAI_API_KEY,
+                            },
+                        )
+        
+                        result = response.json()
+        
+                        if "output_url" in result:
+        
+                            image_response = requests.get(result["output_url"])
+        
+                            image = Image.open(BytesIO(image_response.content))
+        
+                            st.image(
+                                image,
+                                caption="Generated Image",
+                                use_container_width=True,
+                            )
+        
+                        else:
+        
+                            st.error("Image generation failed.")
+        
+                            st.json(result)
+        
+                    except Exception as e:
+        
+                        st.error(f"Error: {e}")
+        
+        else:
+            st.warning("Please enter an image prompt.")
